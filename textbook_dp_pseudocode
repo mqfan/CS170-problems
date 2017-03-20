@@ -64,6 +64,8 @@ function traveling_salesman:
 
 
 //Largest independent subset in tree
+//the "dp approach" to this question is literally recursion....a natural consequence when there are no overlapping subproblems??
+//Runtime: O(V)
 function largest_subset(T):
 	if T is leaf: return 1
 	let r = root of T
