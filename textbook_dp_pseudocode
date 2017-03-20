@@ -1,0 +1,36 @@
+//textbook dp problems
+//the following will all be pseudocode
+
+//shortest path from s to t that uses at most k edges
+//dist(v, i) = length of shortest path from s to v using exactly i edges
+function shortest_reliable_path(G, s, t, k):
+	for all v in V: dist(v, 0) = infinity
+	reachable = set()
+	for all c in children(s):
+		reachable.add((c, 1)) //tuple of vertex, num_edges to reach there
+
+	for k' = 1 to k:
+		for all v in reachable with num_edges = k':
+			new_dist = min over v's parents {dist(parent, k'-1) + length(parent, v)}
+			dist(v, k') = new_dist	
+			for c in children(v):
+				reachable.add((c, k'+1))
+			reachable.remove((v, k'))
+
+	return min over 1<=e<=k {dist(t, e)}
+
+//shortest path between every pair of vertices in G (Floyd-Warshall)
+//label all vertices v in V from 1 to n
+//dist(i, j, k) = shortest path between i and j with only vertices 1 through k as possible intermediates
+function floyd_warshall(G):
+	for i = 1 to n:
+		for j = 1 to n:
+			dist(i, j, 0) = infinity
+	for (i, j) in E:
+		dist(i, j, 0) = length(i, j)
+
+	for k = 1 to n:
+		for i = 1 to n:
+			for j = 1 to n:
+				dist(i, j, k) = min{ dist(i, j, k-1), dist(i, k, k-1) + dist(k, j, k-1) }
+				
