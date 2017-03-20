@@ -60,3 +60,19 @@ function traveling_salesman:
 					C(S, j) = min{ C(s, j), C(S - {j}, i) + length(i, j) }
 				}
 	return min{ C({1, ..., n}, j) + length(j, 1) } over all j
+
+
+
+//Largest independent subset in tree
+function largest_subset(T):
+	if T is leaf: return 1
+	let r = root of T
+	children_count = 0
+	grandchildren_count = 1 //if we choose to skip the children and instead use the grandchildren, then we can use the root itself
+
+	for c in children of r:
+		children_count += largest_subset(c)
+		for g in children of c:
+			grandchildren_count += largest_subset(g)
+
+	return max(children_count, grandchildren_count)
