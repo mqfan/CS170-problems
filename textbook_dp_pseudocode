@@ -19,6 +19,8 @@ function shortest_reliable_path(G, s, t, k):
 
 	return min over 1<=e<=k {dist(t, e)}
 
+
+
 //shortest path between every pair of vertices in G (Floyd-Warshall)
 //label all vertices v in V from 1 to n
 //dist(i, j, k) = shortest path between i and j with only vertices 1 through k as possible intermediates
@@ -42,3 +44,19 @@ function floyd_warshall(G):
 		for i = 1 to n:
 			for j = 1 to n:
 				dist(i, j, k) = min{ dist(i, j, k-1), dist(i, k, k-1) + dist(k, j, k-1) }
+
+
+//Traveling salesman
+//C(S, j): S is a subset of {1, ..., n} that contains {1}. C is the shortest path starting from 1, touching every node in S once, and ends at j
+//Runtime: O(2^n * n^2)
+function traveling_salesman:
+	C({1}, 1) = 0
+	for k = 2 to n:
+		for all subsets S in {1, ..., n} of size k that contain 1:
+			C(S, 1) = infinity
+			for all j in S, j != 1:
+				C(S, j) = infinity
+				for all i in S, i != 1 and i != j: //i != j is technically unnecessary because C(S, 1) for S != {1} is always infinity
+					C(S, j) = min{ C(s, j), C(S - {j}, i) + length(i, j) }
+				}
+	return min{ C({1, ..., n}, j) + length(j, 1) } over all j
