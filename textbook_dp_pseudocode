@@ -22,6 +22,15 @@ function shortest_reliable_path(G, s, t, k):
 //shortest path between every pair of vertices in G (Floyd-Warshall)
 //label all vertices v in V from 1 to n
 //dist(i, j, k) = shortest path between i and j with only vertices 1 through k as possible intermediates
+/*
+Reason why this works: 
+when we expand the subproblem to allow node k to be used as an intermediate, we have to check for all pairs (i, j) if going through node k leads to
+a shorter path between i and j. Thus, the new potential path between i and j has the form (i, ..., k, ..., j) = (i, ..., k) + (k, ..., j). But,
+we already know the optimal solutions to subproblems dist(i, k, k-1) and dist(k, j, k-1): the optimal paths from i to k going through possibly the
+first k-1 vertices and from k to j etc etc. Therefore, dist(i, j, k) = min{ path not using k, path using k } = 
+min{ dist(i, j, k-1), dist(i, k, k-1) + dist(k, j, k-1) }!!!!!
+*/
+//Runtime: O(V^3)
 function floyd_warshall(G):
 	for i = 1 to n:
 		for j = 1 to n:
@@ -33,4 +42,3 @@ function floyd_warshall(G):
 		for i = 1 to n:
 			for j = 1 to n:
 				dist(i, j, k) = min{ dist(i, j, k-1), dist(i, k, k-1) + dist(k, j, k-1) }
-				
