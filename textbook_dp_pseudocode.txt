@@ -1,0 +1,80 @@
+//textbook dp problems
+//the following will all be pseudocode
+
+//shortest path from s to t that uses at most k edges
+//dist(v, i) = length of shortest path from s to v using exactly i edges
+function shortest_reliable_path(G, s, t, k):
+	for all v in V: dist(v, 0) = infinity
+	reachable = set()
+	for all c in children(s):
+		reachable.add((c, 1)) //tuple of vertex, num_edges to reach there
+
+	for k' = 1 to k:
+		for all v in reachable with num_edges = k':
+			new_dist = min over v's parents {dist(parent, k'-1) + length(parent, v)}
+			dist(v, k') = new_dist	
+			for c in children(v):
+				reachable.add((c, k'+1))
+			reachable.remove((v, k'))
+
+	return min over 1<=e<=k {dist(t, e)}
+
+
+
+//shortest path between every pair of vertices in G (Floyd-Warshall)
+//label all vertices v in V from 1 to n
+//dist(i, j, k) = shortest path between i and j with only vertices 1 through k as possible intermediates
+/*
+Reason why this works: 
+when we expand the subproblem to allow node k to be used as an intermediate, we have to check for all pairs (i, j) if going through node k leads to
+a shorter path between i and j. Thus, the new potential path between i and j has the form (i, ..., k, ..., j) = (i, ..., k) + (k, ..., j). But,
+we already know the optimal solutions to subproblems dist(i, k, k-1) and dist(k, j, k-1): the optimal paths from i to k going through possibly the
+first k-1 vertices and from k to j etc etc. Therefore, dist(i, j, k) = min{ path not using k, path using k } = 
+min{ dist(i, j, k-1), dist(i, k, k-1) + dist(k, j, k-1) }!!!!!
+*/
+//Runtime: O(V^3)
+function floyd_warshall(G):
+	for i = 1 to n:
+		for j = 1 to n:
+			dist(i, j, 0) = infinity
+	for (i, j) in E:
+		dist(i, j, 0) = length(i, j)
+
+	for k = 1 to n:
+		for i = 1 to n:
+			for j = 1 to n:
+				dist(i, j, k) = min{ dist(i, j, k-1), dist(i, k, k-1) + dist(k, j, k-1) }
+
+
+//Traveling salesman
+//C(S, j): S is a subset of {1, ..., n} that contains {1}. C is the shortest path starting from 1, touching every node in S once, and ends at j
+//Runtime: O(2^n * n^2)
+function traveling_salesman:
+	C({1}, 1) = 0
+	for k = 2 to n:
+		for all subsets S in {1, ..., n} of size k that contain 1:
+			C(S, 1) = infinity
+			for all j in S, j != 1:
+				C(S, j) = infinity
+				for all i in S, i != 1 and i != j: //i != j is technically unnecessary because C(S, 1) for S != {1} is always infinity
+					C(S, j) = min{ C(s, j), C(S - {j}, i) + length(i, j) }
+				}
+	return min{ C({1, ..., n}, j) + length(j, 1) } over all j
+
+
+
+//Largest independent subset in tree
+//the "dp approach" to this question is literally recursion....a natural consequence when there are no overlapping subproblems??
+//Runtime: O(V)
+function largest_subset(T):
+	if T is leaf: return 1
+	let r = root of T
+	children_count = 0
+	grandchildren_count = 1 //if we choose to skip the children and instead use the grandchildren, then we can use the root itself
+
+	for c in children of r:
+		children_count += largest_subset(c)
+		for g in children of c:
+			grandchildren_count += largest_subset(g)
+
+	return max(children_count, grandchildren_count)
